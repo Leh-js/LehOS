@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="https://avatars.githubusercontent.com/u/171061506?s=200&v=4"><title>LehOS</title>
+  <style>
+    /* Basic styling for the web OS */
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      font-family: monospace;
+      background-color: #282c34;
+      overflow: hidden;
+      color: #fff;
+    }
+    .desktop {
+      position: relative;
+      width: 100%;
+      height: calc(100% - 40px);
+      background: url('https://img.freepik.com/free-photo/purple-galaxy-background_1017-3748.jpg?t=st=1716986525~exp=1716990125~hmac=09c24c40447e34ec96f5db07dc703bc395a50c7add29b73d4cf07fe81b3207ed&w=740') no-repeat center center;
+      background-size: cover;
+    }
+    .taskbar {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 40px;
+      background-color: #333;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+    }
+    .taskbar .task {
+      margin-right: 10px;
+      cursor: pointer;
+    }
+    .window {
+      position: absolute;
+      width: 600px;
+      height: 400px;
+      background-color: #000;
+      border: 1px solid #444;
+      display: flex;
+      flex-direction: column;
+      resize: both;
+      overflow: auto;
+    }
+    .window.fullscreen {
+      width: 100%;
+      height: calc(100% - 40px);
+      top: 0;
+      left: 0;
+      resize: none;
+    }
+    .window-header {
+      background-color: #444;
+      padding: 5px;
+      cursor: move;
+      display: flex;
+      justify-content: space-between;
+    }
+    .window-header .close {
+      cursor: pointer;
+      color: red;
+    }
+    .window-content {
+      flex-grow: 1;
+      overflow: hidden;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="desktop">
+    <!-- CLI Window -->
+    <div class="window" id="cliWindow" style="top: 50px; left: 50px;">
+      <div class="window-header">
+        <span>lehdah cli</span>
+        <span class="close" onclick="document.getElementById('cliWindow').style.display='none';">x</span>
+      </div>
+      <div class="window-content">
+        <iframe src="https://leh-js.github.io/leh.js/" id="cliFrame"></iframe>
+      </div>
+    </div>
+
+    <!-- VM Window -->
+    <div class="window fullscreen" id="vmWindow" style="display: none;">
+      <div class="window-header">
+        <span>Virtual Machine</span>
+        <span class="close" onclick="document.getElementById('vmWindow').style.display='none';">x</span>
+      </div>
+      <div class="window-content">
+        <iframe src="https://archive.org/embed/win95_in_dosbox" frameborder="0" allowfullscreen="true" scrolling="no"></iframe>
+      </div>
+    </div>
+
+    <!-- Browser Window -->
+    <div class="window fullscreen" id="browserWindow" style="display: none;">
+      <div class="window-header">
+        <span>Browser</span>
+        <span class="close" onclick="document.getElementById('browserWindow').style.display='none';">x</span>
+      </div>
+      <div class="window-content">
+        <iframe src="https://formernetlifyuser.neocities.org/privatebrowser#gsc.tab=0" frameborder="0" allowfullscreen="true" scrolling="yes"></iframe>
+      </div>
+    </div>
+
+    <!-- Calculator Window -->
+    <div class="window" id="calculatorWindow" style="display: none;">
+      <div class="window-header">
+        <span>Calculator</span>
+        <span class="close" onclick="document.getElementById('calculatorWindow').style.display='none';">x</span>
+      </div>
+      <div class="window-content">
+        <iframe src="https://calc-seven-eta.vercel.app/graphingcalc.html" frameborder="0" allowfullscreen="true" scrolling="yes"></iframe>
+      </div>
+    </div>
+
+    <!-- Code Editor Window -->
+    <div class="window" id="codeEditorWindow" style="display: none;">
+      <div class="window-header">
+        <span>Code Editor</span>
+        <span class="close" onclick="document.getElementById('codeEditorWindow').style.display='none';">x</span>
+      </div>
+      <div class="window-content">
+        <iframe src="https://formernetlifyuser.neocities.org/c-editer" frameborder="0" allowfullscreen="true" scrolling="yes"></iframe>
+      </div>
+    </div>
+  </div>
+  <div class="taskbar">
+    <div class="task" onclick="document.getElementById('cliWindow').style.display='block';">CLI</div>
+    <div class="task" onclick="document.getElementById('vmWindow').style.display='block';">Virtual Machine</div>
+    <div class="task" onclick="document.getElementById('browserWindow').style.display='block';">Browser</div>
+    <div class="task" onclick="document.getElementById('calculatorWindow').style.display='block';">Calculator</div>
+    <div class="task" onclick="document.getElementById('codeEditorWindow').style.display='block';">Code Editor</div>
+  </div>
+
+  <script>
+    // Make windows draggable
+    dragElement(document.getElementById("cliWindow"));
+    dragElement(document.getElementById("vmWindow"));
+    dragElement(document.getElementById("browserWindow"));
+    dragElement(document.getElementById("calculatorWindow"));
+    dragElement(document.getElementById("codeEditorWindow"));
+
+    function dragElement(elmnt) {
+      var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+      if (elmnt.querySelector(".window-header")) {
+        elmnt.querySelector(".window-header").onmousedown = dragMouseDown;
+      } else {
+        elmnt.onmousedown = dragMouseDown;
+      }
+
+      function dragMouseDown(e) {
+        e = e || window.event;
+        e.preventDefault();
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        document.onmouseup = closeDragElement;
+        document.onmousemove = elementDrag;
+      }
+
+      function elementDrag(e) {
+        e = e || window.event;
+        e.preventDefault();
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        document.onmouseup = closeDragElement;
+        document.onmousemove = elementDrag;
+      }
+
+      function elementDrag(e) {
+        e = e || window.event;
+        e.preventDefault();
+        pos1 = pos3 - e.clientX;
+        pos2 = pos4 - e.clientY;
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+        elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+      }
+
+      function closeDragElement() {
+        document.onmouseup = null;
+        document.onmousemove = null;
+      }
+    }
+  </script>
+</body>
+</html>
